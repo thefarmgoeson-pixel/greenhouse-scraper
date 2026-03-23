@@ -23,7 +23,8 @@ jobs:
         run: |
           pip install -r scraper/requirements.txt
           playwright install chromium
-          playwright install-deps chromium
+          playwright install-deps chromium || true
+          sudo apt-get install -y libasound2t64 || true
 
       - name: Run scraper
         env:
