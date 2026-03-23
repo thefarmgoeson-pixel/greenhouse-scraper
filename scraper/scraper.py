@@ -50,15 +50,8 @@ HEADERS = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
 }
 
-REQUIRED_KEYWORDS = [
-    "パイプ", "pipe", "骨材", "部材", "単管",
-    "アーチ", "直管", "ハウス", "φ", "mm",
-    "温室", "農業", "ビニール", "資材",
-]
-
 def is_relevant(title):
-    title_lower = title.lower()
-    return any(kw.lower() in title_lower for kw in REQUIRED_KEYWORDS)
+    return True  # no filtering — search terms handle relevance
 
 # ── Google Sheets ─────────────────────────────────────────────────────────────
 
