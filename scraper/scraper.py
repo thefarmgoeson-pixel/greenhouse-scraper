@@ -71,6 +71,7 @@ def load_seen_hashes(seen_ws):
 def save_new_listings(ws, seen_ws, listings, seen_hashes):
     new_listings = []
     new_hashes   = []
+    new_rows     = []
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
 
     for l in listings:
@@ -80,6 +81,8 @@ def save_new_listings(ws, seen_ws, listings, seen_hashes):
             new_hashes.append([h, now])
             new_rows.append([h, l["site"], l["title"], l["price"], l["url"], l["term"], now])
 
+    if new_rows:
+        ws.append_rows(new_rows)
     if new_hashes:
         seen_ws.append_rows(new_hashes)
 
@@ -254,7 +257,16 @@ def run():
         print(f"   Yahoo: {len(yahoo)}, Mercari: {len(mercari)}, JMTY: {len(jmty)}")
         time.sleep(2)
 
-    print(f"\n📦 Total listings found: {len(all_listings)}")
+    # Deduplicate by URL across all search terms
+    seen_urls = set()
+    deduped = []
+    for l in all_listings:
+        if l["url"] not in seen_urls:
+            seen_urls.add(l["url"])
+            deduped.append(l)
+    all_listings = deduped
+
+    print(f"\n📦 Total listings found: {len(all_listings)} (after dedup)")
 
     ws, seen_ws  = get_sheet()
     seen_hashes  = load_seen_hashes(seen_ws)
