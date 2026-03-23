@@ -106,7 +106,7 @@ def save_new_listings(ws, seen_ws, listings, seen_hashes):
             new_rows.append([h, l["site"], l["title"], l["price"], l["url"], img_formula, l["term"], now])
 
     if new_rows:
-        ws.append_rows(new_rows)
+        ws.append_rows(new_rows, value_input_option="USER_ENTERED")
     if new_hashes:
         seen_ws.append_rows(new_hashes)
 
