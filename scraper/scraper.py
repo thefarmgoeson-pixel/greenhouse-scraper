@@ -26,6 +26,14 @@ SEARCH_TERMS = [
     "直管 農業用 中古",
     "ハウス 直管 中古",
     "中古 直管",
+    "アーチパイプ 中古",
+    "アーチパイプ 格安",
+    "ハウスパイプ 引き取り",
+    "ビニールハウス 解体 パイプ",
+    "農業用 アーチ パイプ",
+    "パイプハウス 中古",
+    "農業用ハウス 資材 中古",
+    "ハウス 資材一式 中古",
 ]
 
 GMAIL_USER        = os.environ["GMAIL_USER"]
@@ -45,7 +53,11 @@ HEADERS = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
 }
 
-REQUIRED_KEYWORDS = ["パイプ", "pipe", "骨材", "部材", "単管"]
+REQUIRED_KEYWORDS = [
+    "パイプ", "pipe", "骨材", "部材", "単管",
+    "アーチ", "直管", "ハウス", "φ", "mm",
+    "温室", "農業", "ビニール", "資材",
+]
 
 def is_relevant(title):
     title_lower = title.lower()
