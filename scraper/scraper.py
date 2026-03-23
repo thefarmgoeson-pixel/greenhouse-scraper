@@ -27,13 +27,10 @@ SEARCH_TERMS = [
     "ハウス 直管 中古",
     "中古 直管",
     "アーチパイプ 中古",
-    "アーチパイプ 格安",
-    "ハウスパイプ 引き取り",
     "ビニールハウス 解体 パイプ",
     "農業用 アーチ パイプ",
     "パイプハウス 中古",
     "農業用ハウス 資材 中古",
-    "ハウス 資材一式 中古",
 ]
 
 GMAIL_USER        = os.environ["GMAIL_USER"]
@@ -102,7 +99,7 @@ def save_new_listings(ws, seen_ws, listings, seen_hashes):
         if h not in seen_hashes:
             new_listings.append(l)
             new_hashes.append([h, now])
-            img_formula = f'=IMAGE("{l["image"]}")' if l.get("image") else ""
+            img_formula = f'=IMAGE("{l["image"]}",4,200,200)' if l.get("image") else ""
             new_rows.append([h, l["site"], l["title"], l["price"], l["url"], img_formula, l["term"], now])
 
     if new_rows:
