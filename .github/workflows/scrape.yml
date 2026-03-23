@@ -2,13 +2,13 @@ name: Greenhouse Pipe Scraper
 
 on:
   schedule:
-    - cron: "0 1 * * *"   # 10:00 AM JST (01:00 UTC)
-    - cron: "0 22 * * *"  # 07:00 AM JST next day (22:00 UTC) — optional second run
-  workflow_dispatch:       # allow manual trigger from GitHub UI anytime
+    - cron: "0 1 * * *"   # 10:00 AM JST
+    - cron: "0 22 * * *"  # 07:00 AM JST
+  workflow_dispatch:
 
 jobs:
   scrape:
-    runs-on: ubuntu-22.04   # use 22.04 — avoids libasound2 issue on 24.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repo
@@ -20,16 +20,13 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: |
-          pip install -r scraper/requirements.txt
-          playwright install chromium
-          playwright install-deps chromium
+        run: pip install -r scraper/requirements.txt
 
       - name: Run scraper
         env:
-          GMAIL_USER:                  ${{ secrets.GMAIL_USER }}
-          GMAIL_APP_PASSWORD:          ${{ secrets.GMAIL_APP_PASSWORD }}
-          NOTIFY_EMAIL:                ${{ secrets.NOTIFY_EMAIL }}
-          GOOGLE_SHEET_ID:             ${{ secrets.GOOGLE_SHEET_ID }}
-          GCP_SERVICE_ACCOUNT_JSON:    ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+          GMAIL_USER:               ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD:       ${{ secrets.GMAIL_APP_PASSWORD }}
+          NOTIFY_EMAIL:             ${{ secrets.NOTIFY_EMAIL }}
+          GOOGLE_SHEET_ID:          ${{ secrets.GOOGLE_SHEET_ID }}
+          GCP_SERVICE_ACCOUNT_JSON: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
         run: python scraper/scraper.py
