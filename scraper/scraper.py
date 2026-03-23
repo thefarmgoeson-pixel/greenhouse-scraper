@@ -40,6 +40,12 @@ HEADERS = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
 }
 
+REQUIRED_KEYWORDS = ["パイプ", "pipe", "骨材", "部材", "単管"]
+
+def is_relevant(title):
+    title_lower = title.lower()
+    return any(kw.lower() in title_lower for kw in REQUIRED_KEYWORDS)
+
 # ── Google Sheets ─────────────────────────────────────────────────────────────
 
 def get_sheet():
@@ -52,7 +58,7 @@ def get_sheet():
         ws = sh.worksheet("Listings")
     except gspread.WorksheetNotFound:
         ws = sh.add_worksheet(title="Listings", rows=5000, cols=10)
-        ws.append_row(["ID", "Site", "Title", "Price", "URL", "Search Term", "Found At"])
+        ws.append_row(["ID", "Site", "Title", "Price", "URL", "Image", "Search Term", "Found At"])
 
     try:
         seen_ws = sh.worksheet("Seen")
@@ -79,7 +85,8 @@ def save_new_listings(ws, seen_ws, listings, seen_hashes):
         if h not in seen_hashes:
             new_listings.append(l)
             new_hashes.append([h, now])
-            new_rows.append([h, l["site"], l["title"], l["price"], l["url"], l["term"], now])
+            img_formula = f'=IMAGE("{l["image"]}")' if l.get("image") else ""
+            new_rows.append([h, l["site"], l["title"], l["price"], l["url"], img_formula, l["term"], now])
 
     if new_rows:
         ws.append_rows(new_rows)
@@ -155,11 +162,13 @@ def scrape_yahoo(term):
             title_el = item.select_one(".Product__title")
             price_el = item.select_one(".Product__priceValue")
             link_el  = item.select_one("a.Product__imageLink, a.Product__titleLink")
+            img_el   = item.select_one("img")
             title = title_el.get_text(strip=True) if title_el else "—"
             price = price_el.get_text(strip=True) if price_el else "—"
             href  = link_el["href"] if link_el else ""
-            if href:
-                listings.append({"site": "Yahoo", "title": title, "price": price, "url": href, "term": term})
+            image = img_el.get("src") or img_el.get("data-src") or "" if img_el else ""
+            if href and is_relevant(title):
+                listings.append({"site": "Yahoo", "title": title, "price": price, "url": href, "image": image, "term": term})
     except Exception as e:
         print(f"Yahoo error [{term}]: {e}")
     return listings
@@ -215,8 +224,9 @@ def scrape_mercari(term):
             price = f"¥{item.get('price', '—'):,}" if isinstance(item.get("price"), int) else "—"
             item_id = item.get("id", "")
             href = f"https://jp.mercari.com/item/{item_id}" if item_id else ""
-            if href:
-                listings.append({"site": "Mercari", "title": title, "price": price, "url": href, "term": term})
+            image = item.get("thumbnails", [{}])[0].get("url", "") if item.get("thumbnails") else ""
+            if href and is_relevant(title):
+                listings.append({"site": "Mercari", "title": title, "price": price, "url": href, "image": image, "term": term})
     except Exception as e:
         print(f"Mercari error [{term}]: {e}")
     return listings
@@ -236,9 +246,11 @@ def scrape_jmty(term):
             title = title_el.get_text(strip=True) if title_el else "—"
             price = price_el.get_text(strip=True) if price_el else "—"
             href  = link_el["href"] if link_el else ""
-            if href:
+            img_el = item.select_one("img")
+            image = img_el.get("src") or img_el.get("data-src") or "" if img_el else ""
+            if href and is_relevant(title):
                 full_url = f"https://jmty.jp{href}" if href.startswith("/") else href
-                listings.append({"site": "JMTY", "title": title, "price": price, "url": full_url, "term": term})
+                listings.append({"site": "JMTY", "title": title, "price": price, "url": full_url, "image": image, "term": term})
     except Exception as e:
         print(f"JMTY error [{term}]: {e}")
     return listings
