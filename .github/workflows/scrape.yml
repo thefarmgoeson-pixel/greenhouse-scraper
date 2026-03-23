@@ -8,7 +8,7 @@ on:
 
 jobs:
   scrape:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04   # use 22.04 — avoids libasound2 issue on 24.04
 
     steps:
       - name: Checkout repo
@@ -23,8 +23,7 @@ jobs:
         run: |
           pip install -r scraper/requirements.txt
           playwright install chromium
-          playwright install-deps chromium || true
-          sudo apt-get install -y libasound2t64 || true
+          playwright install-deps chromium
 
       - name: Run scraper
         env:
