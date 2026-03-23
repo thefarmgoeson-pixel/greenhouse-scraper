@@ -78,7 +78,7 @@ def save_new_listings(ws, seen_ws, listings, seen_hashes):
         if h not in seen_hashes:
             new_listings.append(l)
             new_hashes.append([h, now])
-            ws.append_row([h, l["site"], l["title"], l["price"], l["url"], l["term"], now])
+            new_rows.append([h, l["site"], l["title"], l["price"], l["url"], l["term"], now])
 
     if new_hashes:
         seen_ws.append_rows(new_hashes)
